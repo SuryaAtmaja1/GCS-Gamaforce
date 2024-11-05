@@ -4,6 +4,7 @@ import {useEffect, useRef } from 'react'
 import "leaflet/dist/leaflet.css"
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet'
+// import LogoGama from './assets/LogoGama';
 
 
 const MapComponen = () =>{
