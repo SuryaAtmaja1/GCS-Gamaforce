@@ -9,7 +9,9 @@ function App() {
 
   return (
     <>
-    <MapComponen />
+      <div className="overflow-hidden">
+        <MapComponen />
+      </div>
     </>
   );
 }
