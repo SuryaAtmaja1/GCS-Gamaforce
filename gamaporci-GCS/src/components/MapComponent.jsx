@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 // import LogoGama from './assets/LogoGama';
 
-const MapComponen = () => {
+const MapComponent = () => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
 
@@ -49,10 +49,10 @@ const MapComponen = () => {
     }
   }, []);
   return (
-    <div className="w-screen h-screen" ref={mapRef}>
+    <div className="w-screen h-screen overflow-hidden" ref={mapRef}>
       MapComponent
     </div>
   );
 };
 
-export default MapComponen;
+export default MapComponent;
