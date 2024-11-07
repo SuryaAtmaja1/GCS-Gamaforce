@@ -7,7 +7,7 @@ function App() {
     <>
       <div className="overflow-hidden relative">
         <MapComponent />
-        <div className="z-[999] absolute left-0 top-0 ">
+        <div className="z-[9999] absolute left-0 top-0 ">
           <SideBar />
         </div>
       </div>
