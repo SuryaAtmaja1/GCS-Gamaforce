@@ -5,11 +5,11 @@ import SideBar from "./components/SideBar";
 function App() {
   return (
     <>
-      <div className="overflow-hidden">
-        <MapComponent /> 
-      </div>
-      <div className="pl-64">
-        <SideBar />
+      <div className="overflow-hidden relative">
+        <MapComponent />
+        <div className="z-[999] absolute left-0 top-0 ">
+          <SideBar />
+        </div>
       </div>
     </>
   );
