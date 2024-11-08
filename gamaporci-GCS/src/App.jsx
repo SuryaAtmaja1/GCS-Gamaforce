@@ -11,9 +11,6 @@ function App() {
         <div className="z-[999] absolute">
           <SideBar />
         </div>
-        <div className="z-[999] absolute ">
-          <AddMarker />
-        </div>
       </div>
     </>
   );
