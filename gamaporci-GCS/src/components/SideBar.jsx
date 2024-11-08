@@ -1,21 +1,36 @@
 import React, { useState } from "react";
-import logoGama from "../assets/logoGama.png"
-import { RiDashboardLine } from "react-icons/ri";
-import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
+import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
-const SideBar = () => {
+const SideBar = ({onCoordinatesChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [coordinates, setCoordinates] = useState({
-    lat: -7.773648529865574,
-    lng: 110.37838175455724,
+    lat: "-7.773648529865574",
+    lng: "110.37838175455724",
   });
 
-  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Hanya izinkan input angka, minus, dan titik
+    if (/^-?\d*\.?\d*$/.test(value) || value === '') {
+      const newCoordinates = {
+        ...coordinates,
+        [name]: value
+      };
+      
+      setCoordinates(newCoordinates);
+
+      // Konversi ke float saat mengirim ke parent component
+      onCoordinatesChange({
+        ...newCoordinates,
+        [name]: parseFloat(value) || 0
+      });
+    }
+  };
 
   return (
     <div className="fixed left-0 top-0 h-screen flex">
-      {/* Main sidebar */}
       <div 
         className={`
           h-full 
@@ -33,73 +48,50 @@ const SideBar = () => {
           <img src="/src/assets/logoGama.png" alt="Logo" className="w-8 h-8 mr-3"/>
           {isOpen && <a href="https://gamaforce.wg.ugm.ac.id/" className="text-lg font-semibold">Gamaforce</a>}
         </div>
-        
-        {/* <div className="mb-4">
-          {isOpen && <FaUsers>
-            tesss
-            </FaUsers>}
-        </div> */}
 
         <nav>
           <ul className="space-y-4">
             <li>
               <button className="flex items-center p-2 w-full rounded-md hover:bg-blue-700 transition">
                 <FaUsers size={20} />
-                {isOpen && <a href="https://gamaforce.wg.ugm.ac.id/about-us/" className="ml-3"> About Us</a>} 
-                {/* gsnti pan jdi <a href=""></a> */}
+                {isOpen && <a href="https://gamaforce.wg.ugm.ac.id/about-us/" className="ml-3">About Us</a>}
               </button>
             </li>
 
-            {/* input koordinat */}
             {isOpen && (
               <li className="space-y-2">
                 <div className="p-2">
                   <label className="block text-sm font-medium mb-1">
-                    Latitude: 
+                    Latitude:
                   </label>
                   <input 
-                  type="number" 
-                  step="any" 
-                  name="lat"
-                  value={coordinates}
-                  >
-                  </input>
+                    type="text"
+                    name="lat"
+                    value={coordinates.lat}
+                    onChange={handleInputChange}
+                    className="w-full px-2 py-1 rounded text-black text-sm"
+                    placeholder="Enter Latitude"
+                  />
+                </div>
+                <div className="p-2">
+                  <label className="block text-sm font-medium mb-1">
+                    Longitude:
+                  </label>
+                  <input 
+                    type="text"
+                    name="lng"
+                    value={coordinates.lng}
+                    onChange={handleInputChange}
+                    className="w-full px-2 py-1 rounded text-black text-sm"
+                    placeholder="Enter longitude"
+                  />
                 </div>
               </li>
-            )
-
-            }
-
-            {/* <li>
-              <button className="flex items-center p-2 w-full bg-blue-700 rounded-md">
-                <Eye size={20} />
-                {isOpen && <span className="ml-3"></span>}
-              </button>
-            </li>
-            <li>
-              <button className="flex items-center p-2 w-full rounded-md hover:bg-blue-700 transition">
-                <Map size={20} />
-                {isOpen && <span className="ml-3">Plan</span>}
-              </button>
-            </li>
-            <li>
-              <button className="flex items-center p-2 w-full rounded-md hover:bg-blue-700 transition">
-                <Settings size={20} />
-                {isOpen && <span className="ml-3">Parameter</span>}
-              </button>
-            </li> */}
+            )}
           </ul>
         </nav>
-
-        {/* <div className="absolute bottom-6 left-0 w-full px-6">
-          <button className="flex items-center p-2 w-full rounded-md hover:bg-blue-700 transition">
-            <LogOut size={20} />
-            {isOpen && <span className="ml-3">Log Out</span>}
-          </button>
-        </div> */}
       </div>
 
-      {/* Toggle button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="absolute -right-3 top-6 bg-blue-600 rounded-full p-1 text-white hover:bg-blue-700"
