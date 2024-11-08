@@ -1,14 +1,18 @@
 import "./App.css";
 import MapComponent from "./components/MapComponent";
 import SideBar from "./components/SideBar";
+import AddMarker from "./components/AddMarker";
 
 function App() {
   return (
     <>
       <div className="overflow-hidden relative">
         <MapComponent />
-        <div className="z-[999] absolute left-0 top-0 ">
+        <div className="z-[999] absolute">
           <SideBar />
+        </div>
+        <div className="z-[999] absolute ">
+          <AddMarker />
         </div>
       </div>
     </>
