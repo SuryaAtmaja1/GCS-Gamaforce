@@ -1,13 +1,14 @@
 //componen untuk menampilkan map
 // import
-import L from "leaflet";
+import L, { map } from "leaflet";
 import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 // import LogoGama from './assets/LogoGama';
 
-const MapComponent = () => {
+const MapComponent = ({ coordinates = { lat: -7.773648529865574, lng: 110.37838175455724} }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
+  const markerRef = useRef(null);
 
   useEffect(() => {
     if (mapRef.current && !mapInstance.current) {
@@ -15,7 +16,7 @@ const MapComponent = () => {
         //harus diisiset view
         //bisa dibuat code dimana user menginputkan nilai
         //input nilai untuk menampilkan koordinat
-        [-7.773648529865574, 110.37838175455724],
+        [coordinates.lat, coordinates,lng],
         13
       );
 
@@ -23,31 +24,38 @@ const MapComponent = () => {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(mapInstance.current);
-      //add marker
-      const marker = L.marker([-7.773648529865574, 110.37838175455724]).addTo(
-        mapInstance.current
-      );
-      // add popup
-      marker.bindPopup("y").openPopup();
+
+
+      // //add marker
+      // const marker = L.marker([-7.773648529865574, 110.37838175455724]).addTo(
+      //   mapInstance.current
+      // );
+      // // add popup
+      // marker.bindPopup("y").openPopup();
 
       //add icon
       const customItem = L.icon({
         iconUrl:
-          "https://w7.pngwing.com/pngs/787/429/png-transparent-lightning-mcqueen-mater-doc-hudson-cars-cars-3-red-lightning-mcqueen-car-desktop-wallpaper-pixar-thumbnail.png",
-        iconSize: [38, 95],
-        iconAnchor: [22, 94],
+          "/src/assets/logoGama.png",
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
         popupAnchor: [-3, -76],
       });
 
       //gmrt
-      L.marker([-7.773648529865574, 110.37838175455724], {
+      markerRef.current = L.marker([coordinates.lat, coordinates.lng], {
         icon: customItem,
       })
         .addTo(mapInstance.current)
         .bindPopup("apya")
         .openPopup();
     }
-  }, []);
+    if(mapInstance.current && markerRef.current){
+      markerRef.current.setLatLng([coordinates.lat, coordinates.lng]);
+      mapInstance.current.setView([coordinates.lat, coordinates.lng], 13);
+      markerRef.current.bindPopup(`Lat: ${coordinates.lat}, Lng: ${coordinates.lng}`).openPopup();
+    }
+  }, [coordinates]);
   return (
     <div className="w-screen h-screen overflow-hidden" ref={mapRef}>
       MapComponent
