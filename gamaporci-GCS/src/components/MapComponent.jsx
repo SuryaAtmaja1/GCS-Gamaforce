@@ -1,6 +1,4 @@
-//componen untuk menampilkan map
-// import
-import L, { map } from "leaflet";
+import L from "leaflet";
 import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 
@@ -13,10 +11,8 @@ const MapComponent = ({
 
   useEffect(() => {
     if (mapRef.current && !mapInstance.current) {
+      // Inisialisasi peta hanya satu kali
       mapInstance.current = L.map(mapRef.current).setView(
-        //harus diisiset view
-        //bisa dibuat code dimana user menginputkan nilai
-        //input nilai untuk menampilkan koordinat
         [coordinates.lat, coordinates.lng],
         13
       );
@@ -26,23 +22,18 @@ const MapComponent = ({
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(mapInstance.current);
 
-      // //add marker
-      // const marker = L.marker([-7.773648529865574, 110.37838175455724]).addTo(
+      // // Inisialisasi marker pada peta
+      // markerRef.current = L.marker([coordinates.lat, coordinates.lng]).addTo(
       //   mapInstance.current
       // );
-      // // add popup
-      // marker.bindPopup("y").openPopup();
-
-      //add icon
-      const customItem = L.icon({
-        iconUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaYtTmIxIyYVEbkj2HOeLrg2XbOX6UCWz89g&s",
-        iconSize: [38, 95],
-        iconAnchor: [22, 94],
-        popupAnchor: [-3, -76],
-      });
     }
+    // else if (mapInstance.current && markerRef.current) {
+    //   // Memperbarui posisi peta dan marker ketika koordinat berubah
+    //   mapInstance.current.setView([coordinates.lat, coordinates.lng], 13);
+    //   markerRef.current.setLatLng([coordinates.lat, coordinates.lng]);
+    // }
   }, [coordinates]);
+
   return (
     <div className="w-screen h-screen overflow-hidden" ref={mapRef}>
       MapComponent
