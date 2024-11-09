@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { FaUsers } from "react-icons/fa";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { FaMap } from "react-icons/fa";
 
-const SideBar = ({onCoordinatesChange }) => {
+const SideBar = ({ onCoordinatesChange, latLonClick, setLatLonClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [coordinates, setCoordinates] = useState({
     lat: "-7.773648529865574",
@@ -11,27 +12,30 @@ const SideBar = ({onCoordinatesChange }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+    const handleLatLonOpen = () => {
+      setLatLonClick(true);
+    };
+
     // Hanya izinkan input angka, minus, dan titik
-    if (/^-?\d*\.?\d*$/.test(value) || value === '') {
+    if (/^-?\d*\.?\d*$/.test(value) || value === "") {
       const newCoordinates = {
         ...coordinates,
-        [name]: value
+        [name]: value,
       };
-      
+
       setCoordinates(newCoordinates);
 
       // Konversi ke float saat mengirim ke parent component
       onCoordinatesChange({
         ...newCoordinates,
-        [name]: parseFloat(value) || 0
+        [name]: parseFloat(value) || 0,
       });
     }
   };
 
   return (
     <div className="fixed left-0 top-0 h-screen flex">
-      <div 
+      <div
         className={`
           h-full 
           transition-all 
@@ -40,13 +44,24 @@ const SideBar = ({onCoordinatesChange }) => {
           from-blue-600 
           to-teal-500 
           text-white
-          ${isOpen ? 'w-64' : 'w-20'}
+          ${isOpen ? "w-64" : "w-20"}
           p-6
         `}
       >
         <div className="flex items-center mb-6">
-          <img src="/src/assets/logoGama.png" alt="Logo" className="w-8 h-8 mr-3"/>
-          {isOpen && <a href="https://gamaforce.wg.ugm.ac.id/" className="text-lg font-semibold">Gamaforce</a>}
+          <img
+            src="/src/assets/logoGama.png"
+            alt="Logo"
+            className="w-8 h-8 mr-3"
+          />
+          {isOpen && (
+            <a
+              href="https://gamaforce.wg.ugm.ac.id/"
+              className="text-lg font-semibold"
+            >
+              Gamaforce
+            </a>
+          )}
         </div>
 
         <nav>
@@ -54,7 +69,14 @@ const SideBar = ({onCoordinatesChange }) => {
             <li>
               <button className="flex items-center p-2 w-full rounded-md hover:bg-blue-700 transition">
                 <FaUsers size={20} />
-                {isOpen && <a href="https://gamaforce.wg.ugm.ac.id/about-us/" className="ml-3">About Us</a>}
+                {isOpen && (
+                  <a
+                    href="https://gamaforce.wg.ugm.ac.id/about-us/"
+                    className="ml-3"
+                  >
+                    About Us
+                  </a>
+                )}
               </button>
             </li>
 
@@ -64,7 +86,7 @@ const SideBar = ({onCoordinatesChange }) => {
                   <label className="block text-sm font-medium mb-1">
                     Latitude:
                   </label>
-                  <input 
+                  <input
                     type="text"
                     name="lat"
                     value={coordinates.lat}
@@ -77,7 +99,7 @@ const SideBar = ({onCoordinatesChange }) => {
                   <label className="block text-sm font-medium mb-1">
                     Longitude:
                   </label>
-                  <input 
+                  <input
                     type="text"
                     name="lng"
                     value={coordinates.lng}
@@ -88,11 +110,20 @@ const SideBar = ({onCoordinatesChange }) => {
                 </div>
               </li>
             )}
+            <li>
+              <button
+                onClick={setLatLonClick}
+                className="flex items-center p-2 w-full rounded-md hover:bg-blue-700 transition"
+              >
+                <FaMap size={20} />
+                {isOpen && <p className="ml-3">Set Lat & Lon</p>}
+              </button>
+            </li>
           </ul>
         </nav>
       </div>
 
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="absolute -right-3 top-6 bg-blue-600 rounded-full p-1 text-white hover:bg-blue-700"
       >
