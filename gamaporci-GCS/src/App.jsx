@@ -17,12 +17,14 @@ function App() {
     <>
       <div className="flex relative">
         <div className="absolute z-[1001]">
-          <SideBar
-            onCoordinatesChange={handleInputChange}
-            latLonClick={latLonClick}
-            setLatLonClick={setLatLonClick}
-          />
-          {latLonClick && <LatLonModal setLatLonClick={setLatLonClick} />}
+          <SideBar latLonClick={latLonClick} setLatLonClick={setLatLonClick} />
+          {latLonClick && (
+            <LatLonModal
+              setLatLonClick={setLatLonClick}
+              coordinates={coordinates}
+              onCoordinatesChange={handleInputChange}
+            />
+          )}
         </div>
         <MapComponent coordinates={coordinates} />
       </div>

@@ -4,7 +4,9 @@ import L, { map } from "leaflet";
 import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 
-const MapComponent = ({ coordinates = { lat: -7.773648529865574, lng: 110.37838175455724} }) => {
+const MapComponent = ({
+  coordinates = { lat: -7.773648529865574, lng: 110.37838175455724 },
+}) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markerRef = useRef(null);
@@ -24,7 +26,6 @@ const MapComponent = ({ coordinates = { lat: -7.773648529865574, lng: 110.378381
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(mapInstance.current);
 
-
       // //add marker
       // const marker = L.marker([-7.773648529865574, 110.37838175455724]).addTo(
       //   mapInstance.current
@@ -40,19 +41,6 @@ const MapComponent = ({ coordinates = { lat: -7.773648529865574, lng: 110.378381
         iconAnchor: [22, 94],
         popupAnchor: [-3, -76],
       });
-
-      //gmrt
-      markerRef.current = L.marker([coordinates.lat, coordinates.lng], {
-        icon: customItem,
-      })
-        .addTo(mapInstance.current)
-        .bindPopup("apya")
-        .openPopup();
-    }
-    if(mapInstance.current && markerRef.current){
-      markerRef.current.setLatLng([coordinates.lat, coordinates.lng]);
-      mapInstance.current.setView([coordinates.lat, coordinates.lng], 13);
-      markerRef.current.bindPopup(`Lat: ${coordinates.lat}, Lng: ${coordinates.lng}`).openPopup();
     }
   }, [coordinates]);
   return (

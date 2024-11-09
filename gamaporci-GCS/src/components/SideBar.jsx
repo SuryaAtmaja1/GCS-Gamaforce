@@ -3,34 +3,10 @@ import { FaUsers } from "react-icons/fa";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { FaMap } from "react-icons/fa";
 
-const SideBar = ({ onCoordinatesChange, latLonClick, setLatLonClick }) => {
+const SideBar = ({ latLonClick, setLatLonClick }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [coordinates, setCoordinates] = useState({
-    lat: "-7.773648529865574",
-    lng: "110.37838175455724",
-  });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    const handleLatLonOpen = () => {
-      setLatLonClick(true);
-    };
-
-    // Hanya izinkan input angka, minus, dan titik
-    if (/^-?\d*\.?\d*$/.test(value) || value === "") {
-      const newCoordinates = {
-        ...coordinates,
-        [name]: value,
-      };
-
-      setCoordinates(newCoordinates);
-
-      // Konversi ke float saat mengirim ke parent component
-      onCoordinatesChange({
-        ...newCoordinates,
-        [name]: parseFloat(value) || 0,
-      });
-    }
+  const handleModal = () => {
+    setLatLonClick(!latLonClick);
   };
 
   return (
@@ -80,39 +56,9 @@ const SideBar = ({ onCoordinatesChange, latLonClick, setLatLonClick }) => {
               </button>
             </li>
 
-            {isOpen && (
-              <li className="space-y-2">
-                <div className="p-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Latitude:
-                  </label>
-                  <input
-                    type="text"
-                    name="lat"
-                    value={coordinates.lat}
-                    onChange={handleInputChange}
-                    className="w-full px-2 py-1 rounded text-black text-sm"
-                    placeholder="Enter Latitude"
-                  />
-                </div>
-                <div className="p-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Longitude:
-                  </label>
-                  <input
-                    type="text"
-                    name="lng"
-                    value={coordinates.lng}
-                    onChange={handleInputChange}
-                    className="w-full px-2 py-1 rounded text-black text-sm"
-                    placeholder="Enter longitude"
-                  />
-                </div>
-              </li>
-            )}
             <li>
               <button
-                onClick={setLatLonClick}
+                onClick={handleModal}
                 className="flex items-center p-2 w-full rounded-md hover:bg-blue-700 transition"
               >
                 <FaMap size={20} />
