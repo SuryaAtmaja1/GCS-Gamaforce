@@ -21,17 +21,10 @@ const MapComponent = ({
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(mapInstance.current);
-
-      // // Inisialisasi marker pada peta
-      // markerRef.current = L.marker([coordinates.lat, coordinates.lng]).addTo(
-      //   mapInstance.current
-      // );
+    } else if (mapInstance.current) {
+      // Memperbarui posisi peta dan marker ketika koordinat berubah
+      mapInstance.current.setView([coordinates.lat, coordinates.lng], 13);
     }
-    // else if (mapInstance.current && markerRef.current) {
-    //   // Memperbarui posisi peta dan marker ketika koordinat berubah
-    //   mapInstance.current.setView([coordinates.lat, coordinates.lng], 13);
-    //   markerRef.current.setLatLng([coordinates.lat, coordinates.lng]);
-    // }
   }, [coordinates]);
 
   return (
