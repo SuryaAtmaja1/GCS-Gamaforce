@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import { FaUsers } from "react-icons/fa";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-import { FaMap } from "react-icons/fa";
+import { FaMap, FaList } from "react-icons/fa";
 
-const SideBar = ({ latLonClick, setLatLonClick }) => {
+const SideBar = ({ latLonClick, setLatLonClick, missionClick, setMissionClick }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const handleModal = () => {
+  
+  const handleLatLonModal = () => {
     setLatLonClick(!latLonClick);
+    if (missionClick) setMissionClick(false); // Close mission modal if open
+  };
+
+  const handleMissionModal = () => {
+    setMissionClick(!missionClick);
+    if (latLonClick) setLatLonClick(false); // Close latlon modal if open
   };
 
   return (
@@ -58,11 +65,21 @@ const SideBar = ({ latLonClick, setLatLonClick }) => {
 
             <li>
               <button
-                onClick={handleModal}
+                onClick={handleLatLonModal}
                 className="flex items-center p-2 w-full rounded-md hover:bg-blue-700 transition"
               >
                 <FaMap size={20} />
                 {isOpen && <p className="ml-3">Set Lat & Lon</p>}
+              </button>
+            </li>
+
+            <li>
+              <button
+                onClick={handleMissionModal}
+                className="flex items-center p-2 w-full rounded-md hover:bg-blue-700 transition"
+              >
+                <FaList size={20} />
+                {isOpen && <p className="ml-3">Missions</p>}
               </button>
             </li>
           </ul>
