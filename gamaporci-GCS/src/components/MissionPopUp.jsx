@@ -1,11 +1,17 @@
 import React, { useState, useMemo } from "react";
+//impor dari react icon untuk icon di side bar
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 
+
+//deklarasi mission popup dengan missions dibuat kosong
 const MissionPopup = ({ setMissionClick, missions = [], onMissionUpdate, onMissionDelete }) => {
   const [newMission, setNewMission] = useState({
+    //seharusnya nanti di gabungin sama backend untuk save dan load file misi
     name: "",
     description: "",
+    //dengan nama month dan yearnya dibuat auto tanpa perlu diinputkan satu satu
+    //dengan local data string sebagai salam satu format
     date: new Date().toLocaleDateString('id-ID', {
       day: 'numeric',
       month: 'numeric',
