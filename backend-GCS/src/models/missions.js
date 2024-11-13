@@ -16,7 +16,7 @@ class Mission {
       db.all("SELECT * FROM missions", [], (err, rows) => {
         if (err) {
           console.error("Database query error:", err);
-          reject(err); // This prevents uncaught errors that may terminate the server
+          reject(err);
         } else {
           const missions = rows.map((row) => ({
             ...row,
@@ -31,19 +31,20 @@ class Mission {
   }
 
   static async create(missionData) {
-    const { nama, description, coord } = missionData;
+    const { nama, description, date, coord } = missionData;
     const home = coord[0];
     const geoJSON = this.createGeoJSON(coord);
 
     return new Promise((resolve, reject) => {
       db.run(
-        `INSERT INTO missions (nama, description, coord, home, geoJSON)
-        VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO missions (nama, description, coord, home, date, geoJSON)
+        VALUES (?, ?, ?, ?, ?, ?)`,
         [
           nama,
           description || null,
           JSON.stringify(coord),
           JSON.stringify(home),
+          date,
           JSON.stringify(geoJSON),
         ],
         function (err) {
@@ -54,6 +55,7 @@ class Mission {
             description,
             coord,
             home,
+            date,
             geoJSON,
           });
         }

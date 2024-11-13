@@ -34,6 +34,7 @@ function initializeDatabase() {
           description TEXT,
           coord TEXT NOT NULL,
           home TEXT NOT NULL,
+          date TEXT,
           geoJSON TEXT
         )
       `,
