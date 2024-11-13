@@ -12,6 +12,25 @@ class MissionController {
       });
     }
   }
+
+  static async createMission(req, res) {
+    try {
+      const { nama, description, coord } = req.body;
+      if (!nama || !coord || !Array.isArray(coord)) {
+        return res.status(400).json({
+          status: "error",
+          message: "Data misi tidak valid",
+        });
+      }
+      const newMission = await Mission.create({ nama, description, coord });
+      res.status(201).json(newMission);
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Gagal membuat misi",
+      });
+    }
+  }
 }
 
 module.exports = MissionController;
