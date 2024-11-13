@@ -16,6 +16,12 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.log("Connected to SQLite database");
     initializeDatabase();
   }
+  db.on("error", (err) => {
+    if (err.message.includes("closed by peer")) {
+      console.log("Connection lost, reconnecting...");
+      db = connectToDatabase();
+    }
+  });
 });
 
 function initializeDatabase() {
