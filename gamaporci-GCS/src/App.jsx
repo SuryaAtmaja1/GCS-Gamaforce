@@ -27,6 +27,7 @@ function App() {
       name: "Misi 1",
       description: "",
       date: getCurrentDate(),
+      //path : [[marker 1], [marker n]]
     },
     {
       id: 2,
@@ -66,7 +67,7 @@ function App() {
   return (
     <>
       <div className="flex relative">
-        <div className="absolute z-[1001]">
+        <div className="absolute z-[9999]">
           <SideBar 
             latLonClick={latLonClick} 
             setLatLonClick={setLatLonClick}
