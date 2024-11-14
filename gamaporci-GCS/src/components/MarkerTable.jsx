@@ -1,7 +1,14 @@
 import React from 'react';
-import { Trash2 } from 'lucide-react';
+import { FaTrash } from 'react-icons/fa'; 
+// Mengimpor ikon FaTrash dari react-icons
 
+
+//deklarasi komponen fungsi yaitu markertable yang nantinya menerima marker onedit dll
+//merker itu array yang nanti di tampilkan dalamnya
+//oneditmarker itu ga guna tapi dia buat edit markernya
+//ondelete marker ni jga ga guna tapi dia buat hapus marker 
 const MarkerTable = ({ markers, onEditMarker, onDeleteMarker }) => {
+  //deklarasi klo handel delete itu dia nanti ngapain 
   const handleDelete = (index, marker) => {
     if (window.confirm('Hapus marker ini?')) {
       // Memanggil fungsi deleteMarker yang diekspos dari AddMarker
@@ -11,6 +18,7 @@ const MarkerTable = ({ markers, onEditMarker, onDeleteMarker }) => {
     }
   };
 
+  //bentuknya di sini ya
   return (
     <div className="absolute bottom-0 right-0 w-1/3 bg-white shadow-lg rounded-tl-lg overflow-hidden">
       <div className="max-h-36 overflow-y-auto">
@@ -32,7 +40,10 @@ const MarkerTable = ({ markers, onEditMarker, onDeleteMarker }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
+            {/* dia nampilin si datanya itu gimana nanti lewat sini
+            dia pakai map utnuk iterasi si array markersnya itu  */}
             {markers.map((marker, index) => {
+              // dia nanti mengambil koordinat lat dan long denga  marker.getlatlng()
               const latLng = marker.getLatLng();
               return (
                 <tr key={index} className="hover:bg-gray-50">
@@ -51,7 +62,7 @@ const MarkerTable = ({ markers, onEditMarker, onDeleteMarker }) => {
                       className="text-red-500 hover:text-red-700"
                       title="Delete marker"
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
+                      <FaTrash className="h-3.5 w-3.5" />
                     </button>
                   </td>
                 </tr>

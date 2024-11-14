@@ -4,7 +4,10 @@ import { IoCloseCircleOutline } from "react-icons/io5";
 import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 
 
-//deklarasi mission popup dengan missions dibuat kosong
+//deklarasi mission popup 
+//set misi untuk clode modal
+//missions itu array dari missi yang udah ada deaflutnya array kosong tapi disini ku edit agar dia bisa nampilin array lat lng yang dibutuihn untuk load file nantinyaa
+//on mission update ya update dan delete ya untuk delete
 const MissionPopup = ({ setMissionClick, missions = [], onMissionUpdate, onMissionDelete }) => {
   const [newMission, setNewMission] = useState({
     //seharusnya nanti di gabungin sama backend untuk save dan load file misi
@@ -19,21 +22,24 @@ const MissionPopup = ({ setMissionClick, missions = [], onMissionUpdate, onMissi
     })
   });
   
+  //deklarasi serch query
   const [searchQuery, setSearchQuery] = useState("");
   const [editMode, setEditMode] = useState(null);
 
   // Filter missions based on search query
+  //pakai use memo agar optimal
   const filteredMissions = useMemo(() => {
-    return missions.filter(mission =>
-      mission.name.toLowerCase().includes(searchQuery.toLowerCase())
+    return missions.filter(mission =>     mission.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [missions, searchQuery]);
 
+  //reset edit dan close modal
   const handleCloseModal = () => {
     setEditMode(null);
     setMissionClick(false);
   };
 
+  //untuk new mission
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewMission({
@@ -42,10 +48,12 @@ const MissionPopup = ({ setMissionClick, missions = [], onMissionUpdate, onMissi
     });
   };
 
+  //nah si query kepake disini
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
+  //edit misi yang sebelumnya udah ada disini
   const handleEditClick = (mission) => {
     setEditMode(mission.id);
     setNewMission({
@@ -56,17 +64,20 @@ const MissionPopup = ({ setMissionClick, missions = [], onMissionUpdate, onMissi
     });
   };
 
+  // untuk deskripsi misi jika dia lebih dari 50 karakter dia akan .... gitu
   const truncateText = (text, maxLength = 50) => {
     if (!text) return "";
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
   };
 
+  //untuk submit si misinya
   const handleSubmit = () => {
     if (newMission.name.trim() === "") {
       alert("Please enter a mission name");
       return;
     }
 
+    // ini kalau edit
     if (editMode) {
       onMissionUpdate({
         ...newMission,
@@ -77,6 +88,7 @@ const MissionPopup = ({ setMissionClick, missions = [], onMissionUpdate, onMissi
       onMissionUpdate(newMission);
     }
 
+    // ini kalau buat
     setNewMission({
       name: "",
       description: "",
@@ -89,6 +101,7 @@ const MissionPopup = ({ setMissionClick, missions = [], onMissionUpdate, onMissi
   };
 
   return (
+    //semuanya untuk bentuknya aja
     <div className="w-full h-full fixed top-0 left-0 flex justify-center items-center bg-gray-700 bg-opacity-50 z-[10000]">
       <div className="bg-white p-4 rounded-lg w-[600px]">
         {/* Header Section */}

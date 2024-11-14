@@ -2,13 +2,21 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
+// import lah
 
+//deklarasi add marker dengan variable map, markers untuk simpen si array dari marker yang sudah ada, on marker update itu untuk uodate marker nya
 const AddMarker = ({ map, markers, onMarkersUpdate }) => {
+  //draw untuk hold drae items which marker dan garis (polylines)
   const drawnItemsRef = useRef(null);
+  //markersref untuk store marker dan add ke map
   const markersRef = useRef([]);
+  //untuk deklar bahwa dia defaultnya engga edit mode
   const [isMarkerMode, setIsMarkerMode] = useState(false);
+  //mengandung button untuk handling click events
   const buttonContainerRef = useRef(null);
 
+
+  //untuk membuat garis antara marker satu dengan marker yang lainnya
   const drawPolyline = () => {
     try {
       // Remove existing polylines first
@@ -38,7 +46,7 @@ const AddMarker = ({ map, markers, onMarkersUpdate }) => {
 
   useEffect(() => {
     if (!map) return;
-
+    //kalo map maka dia menginisialisasikan items which marker
     try {
       // Initialize FeatureGroup if it doesn't exist
       if (!drawnItemsRef.current) {
@@ -48,7 +56,7 @@ const AddMarker = ({ map, markers, onMarkersUpdate }) => {
 
       const handleMapClick = (e) => {
         if (!isMarkerMode) return;
-
+        //jadi ketika kita click dia di button dia tidak akan mendeteksi itu sebagai inisialisasi marker baru
         if (buttonContainerRef.current) {
           const rect = buttonContainerRef.current.getBoundingClientRect();
           if (e.originalEvent.clientX >= rect.left && 
@@ -59,6 +67,7 @@ const AddMarker = ({ map, markers, onMarkersUpdate }) => {
           }
         }
         
+        //untuk dia bisa dipindah pindah yaw
         try {
           const marker = L.marker(e.latlng, {
             draggable: true
@@ -75,7 +84,7 @@ const AddMarker = ({ map, markers, onMarkersUpdate }) => {
           
           // Draw polyline after adding marker
           drawPolyline();
-        } catch (error) {
+        } catch (error) { //kalau lat dan lon nya tidak terdeteksi dan atau ada fungsi yang salah dalam program
           console.error('Error adding marker:', error);
         }
       };
