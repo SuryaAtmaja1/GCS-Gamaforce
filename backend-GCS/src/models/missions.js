@@ -62,6 +62,68 @@ class Mission {
       );
     });
   }
+
+  static async update(id, missionData) {
+    const { nama, description, coord, date } = missionData;
+    const home = coord[0];
+    const geoJSON = this.createGeoJSON(coord);
+
+    return new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE missions
+         SET nama = ?, description = ?, coord = ?, home = ?, date = ?, geoJSON = ?
+         WHERE mission_id = ?`,
+        [
+          nama,
+          description || null,
+          JSON.stringify(coord),
+          JSON.stringify(home),
+          date,
+          JSON.stringify(geoJSON),
+          id,
+        ],
+        function (err) {
+          if (err) {
+            reject(err);
+          } else {
+            if (this.changes === 0) {
+              resolve(null);
+            } else {
+              resolve({
+                mission_id: id,
+                nama,
+                description,
+                coord,
+                home,
+                date,
+                geoJSON,
+              });
+            }
+          }
+        }
+      );
+    });
+  }
+
+  static async getById(id) {
+    return new Promise((resolve, reject) => {
+      db.get(
+        "SELECT * FROM missions WHERE mission_id = ?",
+        [id],
+        (err, row) => {
+          if (err) reject(err);
+          if (!row) resolve(null);
+          const mission = {
+            ...row,
+            coord: JSON.parse(row.coord),
+            home: JSON.parse(row.home),
+            geoJSON: JSON.parse(row.geoJSON),
+          };
+          resolve(mission);
+        }
+      );
+    });
+  }
 }
 
 module.exports = Mission;
