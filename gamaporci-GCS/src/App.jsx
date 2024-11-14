@@ -4,6 +4,7 @@ import MapComponent from "./components/MapComponent";
 import SideBar from "./components/SideBar";
 import LatLonModal from "./components/LatLonModal";
 import MissionPopup from "./components/MissionPopUp";
+import MarkerTable from "./components/MarkerTable";
 
 function App() {
   const [latLonClick, setLatLonClick] = useState(false);
@@ -12,6 +13,9 @@ function App() {
     lat: -7.773648529865574,
     lng: 110.37838175455724,
   });
+  
+  // Add markers state
+  const [markers, setMarkers] = useState([]);
 
   const getCurrentDate = () => {
     return new Date().toLocaleDateString('id-ID', {
@@ -64,6 +68,24 @@ function App() {
     setMissions(missions.filter(mission => mission.id !== missionId));
   };
 
+  // Add marker handlers
+  const handleMarkersUpdate = (newMarkers) => {
+    setMarkers(newMarkers);
+  };
+
+  const handleEditMarker = (index, marker) => {
+    // You can implement edit functionality here
+    // For example, you could set coordinates and open the LatLonModal
+    console.log('Edit marker:', index, marker.getLatLng());
+  };
+
+  const handleDeleteMarker = (index, marker) => {
+    if (window.confirm('Hapus marker ini?')) {
+      const updatedMarkers = markers.filter((_, i) => i !== index);
+      setMarkers(updatedMarkers);
+    }
+  };
+
   return (
     <>
       <div className="flex relative">
@@ -90,7 +112,21 @@ function App() {
             />
           )}
         </div>
-        <MapComponent coordinates={coordinates} />
+        <div className="relative w-screen h-screen">
+          <MapComponent 
+            coordinates={coordinates} 
+            markers={markers}
+            onMarkersUpdate={handleMarkersUpdate}
+          />
+          {/* Marker Table */}
+          <div className="absolute bottom-4 left-4 right-4 z-[1000]">
+            <MarkerTable 
+              markers={markers}
+              onEditMarker={handleEditMarker}
+              onDeleteMarker={handleDeleteMarker}
+            />
+          </div>
+        </div>
       </div>
     </>
   );
