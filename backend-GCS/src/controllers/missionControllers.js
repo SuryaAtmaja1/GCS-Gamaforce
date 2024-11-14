@@ -85,6 +85,27 @@ class MissionController {
       });
     }
   }
+
+  static async deleteMission(req, res) {
+    try {
+      const deleted = await Mission.delete(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({
+          status: "error",
+          massage: "misi tidak ditemukan",
+        });
+      }
+      res.json({
+        status: "sucsess",
+        massage: "misi berhasil dihapus",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        massage: "gagal menghapus misi",
+      });
+    }
+  }
 }
 
 module.exports = MissionController;

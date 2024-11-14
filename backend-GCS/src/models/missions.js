@@ -124,6 +124,15 @@ class Mission {
       );
     });
   }
+
+  static async delete(id) {
+    return new Promise((resolve, reject) => {
+      db.run("DELETE FROM missions WHERE mission_id = ?", [id], function (err) {
+        if (err) reject(err);
+        resolve(this.changes > 0);
+      });
+    });
+  }
 }
 
 module.exports = Mission;
