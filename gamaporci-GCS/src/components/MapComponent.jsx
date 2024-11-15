@@ -6,24 +6,6 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import AddMarker from "./AddMarker";
 
-// Custom marker icon with blue color and white border
-const blueIcon = L.divIcon({
-  className: 'custom-div-icon',
-  html: `
-    <div style="
-      background-color: #3b82f6;
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      border: 2px solid white;
-      box-shadow: 0 0 4px rgba(0,0,0,0.3);
-    "></div>
-  `,
-  iconSize: [15, 15],
-  iconAnchor: [7.5, 7.5],
-  popupAnchor: [0, -7.5]
-});
-
 const MapComponent = ({
   coordinates = { lat: -7.773648529865574, lng: 110.37838175455724 },
   markers,
@@ -61,7 +43,7 @@ const MapComponent = ({
 
       setMap(mapInstance.current);
     } else if (mapInstance.current) {
-      // Update view if map exists
+      // Update view if coordinates change manually (e.g. from LatLonModal)
       mapInstance.current.setView([coordinates.lat, coordinates.lng], 13);
     }
 
@@ -74,19 +56,7 @@ const MapComponent = ({
     };
   }, [coordinates]);
 
-  // Update map view when markers change
-  useEffect(() => {
-    if (mapInstance.current && markers && markers.length > 0) {
-      const markerLatLngs = markers.map(marker => marker.getLatLng());
-      const bounds = L.latLngBounds(markerLatLngs);
-      mapInstance.current.fitBounds(bounds, {
-        padding: [50, 50],
-        maxZoom: 15
-      });
-    }
-  }, [markers]);
-
-  // Update map when selected mission changes
+  // Update map view ONLY when selected mission changes
   useEffect(() => {
     if (selectedMission && mapInstance.current) {
       if (selectedMission.path?.[0]) {
@@ -112,7 +82,6 @@ const MapComponent = ({
             markers={markers}
             onMarkersUpdate={onMarkersUpdate}
             selectedMission={selectedMission}
-            customIcon={blueIcon}
           />
         )}
       </div>

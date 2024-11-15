@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { FaSave, FaEdit } from 'react-icons/fa';
+import { FaSave, FaEdit, FaMapMarked } from 'react-icons/fa';
 
 const PathHandler = ({ markers, selectedMission, onSavePath }) => {
   const [isEditing, setIsEditing] = useState(false);
   
-  // Handler untuk menyimpan path
   const handleSavePath = () => {
     try {
       if (!selectedMission) {
@@ -12,7 +11,6 @@ const PathHandler = ({ markers, selectedMission, onSavePath }) => {
         return;
       }
 
-      // Konversi marker ke format path
       const path = markers.map(marker => {
         const latLng = marker.getLatLng();
         return {
@@ -21,7 +19,6 @@ const PathHandler = ({ markers, selectedMission, onSavePath }) => {
         };
       });
 
-      // Panggil fungsi onSavePath dengan path baru
       onSavePath(path);
       setIsEditing(false);
       alert('Path saved successfully!');
@@ -32,40 +29,43 @@ const PathHandler = ({ markers, selectedMission, onSavePath }) => {
   };
 
   return (
-    <div className="fixed top-20 right-4 flex flex-col gap-2 z-[1000]">
+    <div className="absolute top-4 right-2 flex flex-col items-end gap-2 z-[1000] p-2 mt-36 ">
       {/* Edit Button */}
       <button
         onClick={() => setIsEditing(!isEditing)}
-        className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg ${
+        className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg transition-colors duration-200 ${
           isEditing 
             ? 'bg-yellow-500 hover:bg-yellow-600' 
             : 'bg-blue-500 hover:bg-blue-600'
         } text-white`}
+        title={isEditing ? 'Cancel editing' : 'Start editing path'}
       >
         <FaEdit />
         <span>{isEditing ? 'Cancel Edit' : 'Edit Path'}</span>
       </button>
 
-      {/* Save Button - hanya muncul saat editing */}
+      {/* Save Button */}
       {isEditing && (
         <button
           onClick={handleSavePath}
-          className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 shadow-lg"
+          className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 shadow-lg transition-colors duration-200"
+          title="Save current path"
         >
           <FaSave />
           <span>Save Path</span>
         </button>
       )}
 
-      {/* Status Indikator */}
-      <div className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm">
+      {/* Mission Info Badge */}
+      <div className="bg-white shadow-lg rounded-lg px-4 py-2 text-sm flex items-center gap-2">
+        <FaMapMarked className="text-blue-500" />
         {selectedMission ? (
-          <>
-            <div>Current Mission: {selectedMission.name}</div>
-            <div>Markers: {markers.length}</div>
-          </>
+          <div>
+            <span className="font-medium">{selectedMission.name}</span>
+            <span className="text-gray-500 ml-2">({markers.length} points)</span>
+          </div>
         ) : (
-          <div>No mission selected</div>
+          <span className="text-gray-500">No mission selected</span>
         )}
       </div>
     </div>

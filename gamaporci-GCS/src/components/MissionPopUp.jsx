@@ -1,6 +1,7 @@
+// MissionPopup.jsx
 import React, { useState, useMemo } from "react";
 import { IoCloseCircleOutline } from "react-icons/io5";
-import { FaEdit, FaTrash, FaSearch, FaMapMarkerAlt, FaMapMarked } from "react-icons/fa";
+import { FaTrash, FaSearch, FaMapMarked } from "react-icons/fa";
 
 const MissionPopup = ({ 
   setMissionClick, 
@@ -10,7 +11,7 @@ const MissionPopup = ({
   currentMarkers = [], 
   onLoadMission 
 }) => {
-  // State untuk misi baru/edit
+  // State untuk misi baru
   const [newMission, setNewMission] = useState({
     name: "",
     description: "",
@@ -22,9 +23,8 @@ const MissionPopup = ({
     path: []
   });
   
-  // State untuk pencarian dan mode edit
+  // State untuk pencarian
   const [searchQuery, setSearchQuery] = useState("");
-  const [editMode, setEditMode] = useState(null);
 
   // Filter misi berdasarkan pencarian
   const filteredMissions = useMemo(() => {
@@ -36,7 +36,6 @@ const MissionPopup = ({
   // Handler untuk menutup modal
   const handleCloseModal = () => {
     try {
-      setEditMode(null);
       setMissionClick(false);
       setNewMission({
         name: "",
@@ -87,26 +86,6 @@ const MissionPopup = ({
     }
   };
 
-  // Handler untuk mode edit
-  const handleEditClick = (mission) => {
-    try {
-      setEditMode(mission.id);
-      setNewMission({
-        id: mission.id,
-        name: mission.name,
-        description: mission.description || "",
-        date: mission.date,
-        path: mission.path || []
-      });
-      if (onLoadMission) {
-        onLoadMission(mission);
-      }
-    } catch (error) {
-      console.error('Error editing mission:', error);
-      alert('Error editing mission. Please try again.');
-    }
-  };
-
   // Handler untuk submit form
   const handleSubmit = () => {
     try {
@@ -124,17 +103,8 @@ const MissionPopup = ({
         }))
       };
 
-      if (editMode) {
-        // Update existing mission
-        onMissionUpdate({
-          ...missionWithPath,
-          id: editMode
-        });
-        setEditMode(null);
-      } else {
-        // Create new mission
-        onMissionUpdate(missionWithPath);
-      }
+      // Create new mission
+      onMissionUpdate(missionWithPath);
 
       // Reset form
       setNewMission({
@@ -176,9 +146,7 @@ const MissionPopup = ({
       <div className="bg-white p-4 rounded-lg w-[600px]">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            {editMode ? 'Edit Mission' : 'Mission List'}
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900">Mission List</h2>
           <IoCloseCircleOutline
             onClick={handleCloseModal}
             className="text-red-500 cursor-pointer"
@@ -188,9 +156,7 @@ const MissionPopup = ({
 
         {/* Form Section */}
         <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-          <h3 className="text-md font-medium text-gray-900 mb-3">
-            {editMode ? 'Edit Mission' : 'Add New Mission'}
-          </h3>
+          <h3 className="text-md font-medium text-gray-900 mb-3">Add New Mission</h3>
           <div className="space-y-3">
             {/* Mission Name Input */}
             <div>
@@ -224,7 +190,7 @@ const MissionPopup = ({
 
             {/* Current Markers Info */}
             <div className="flex items-center text-sm text-gray-600">
-              <FaMapMarkerAlt className="mr-2" />
+              <FaMapMarked className="mr-2" />
               <span>{currentMarkers.length} markers in current path</span>
             </div>
           </div>
@@ -235,7 +201,7 @@ const MissionPopup = ({
               onClick={handleSubmit}
               className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
             >
-              {editMode ? 'Update Mission' : 'Add Mission'}
+              Add Mission
             </button>
           </div>
         </div>
@@ -305,14 +271,6 @@ const MissionPopup = ({
                             title="Load mission markers"
                           >
                             <FaMapMarked size={14} />
-                          </button>
-                          {/* Edit Button */}
-                          <button
-                            onClick={() => handleEditClick(mission)}
-                            className="text-blue-500 hover:text-blue-700"
-                            title="Edit mission"
-                          >
-                            <FaEdit size={14} />
                           </button>
                           {/* Delete Button */}
                           <button

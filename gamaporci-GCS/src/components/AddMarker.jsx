@@ -5,7 +5,7 @@ import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
-const AddMarker = ({ map, markers, onMarkersUpdate, selectedMission, customIcon }) => {
+const AddMarker = ({ map, markers, onMarkersUpdate, selectedMission }) => {
   const drawnItemsRef = useRef(null);
   const markersRef = useRef([]);
   const [isMarkerMode, setIsMarkerMode] = useState(false);
@@ -24,8 +24,8 @@ const AddMarker = ({ map, markers, onMarkersUpdate, selectedMission, customIcon 
       if (markersList.length >= 2) {
         const coordinates = markersList.map(marker => marker.getLatLng());
         polylineRef.current = L.polyline(coordinates, {
-          color: '#3b82f6',
-          weight: 3,
+          color: '#4285F4',
+          weight: 4,
           opacity: 1
         }).addTo(map);
       }
@@ -37,13 +37,26 @@ const AddMarker = ({ map, markers, onMarkersUpdate, selectedMission, customIcon 
   // Clear all layers and markers
   const clearAllLayers = () => {
     try {
+      // Remove all markers from the map
+      markersRef.current.forEach(marker => {
+        map.removeLayer(marker);
+      });
+
+      // Clear drawn items
       if (drawnItemsRef.current) {
         drawnItemsRef.current.clearLayers();
       }
+
+      // Remove polyline
       if (polylineRef.current) {
         map.removeLayer(polylineRef.current);
       }
+
+      // Reset markers array
       markersRef.current = [];
+      
+      // Update parent component's markers
+      onMarkersUpdate([]);
     } catch (error) {
       console.error('Error clearing layers:', error);
     }
@@ -60,8 +73,7 @@ const AddMarker = ({ map, markers, onMarkersUpdate, selectedMission, customIcon 
       if (selectedMission.path && selectedMission.path.length > 0) {
         const newMarkers = selectedMission.path.map(point => {
           const marker = L.marker([point.lat, point.lng], {
-            draggable: true,
-            icon: customIcon
+            draggable: true
           });
 
           marker.on('dragend', () => {
@@ -120,8 +132,7 @@ const AddMarker = ({ map, markers, onMarkersUpdate, selectedMission, customIcon 
 
       try {
         const marker = L.marker(e.latlng, {
-          draggable: true,
-          icon: customIcon
+          draggable: true
         });
 
         marker.on('dragend', () => {
