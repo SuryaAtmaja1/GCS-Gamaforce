@@ -3,32 +3,32 @@ import React, { useState, useMemo } from "react";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { FaTrash, FaSearch, FaMapMarked } from "react-icons/fa";
 
-const MissionPopup = ({ 
-  setMissionClick, 
-  missions = [], 
-  onMissionUpdate, 
+const MissionPopup = ({
+  setMissionClick,
+  missions = [],
+  onMissionUpdate,
   onMissionDelete,
-  currentMarkers = [], 
-  onLoadMission 
+  currentMarkers = [],
+  onLoadMission,
 }) => {
   // State untuk misi baru
   const [newMission, setNewMission] = useState({
     name: "",
     description: "",
-    date: new Date().toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'numeric',
-      year: 'numeric'
+    date: new Date().toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
     }),
-    path: []
+    path: [],
   });
-  
+
   // State untuk pencarian
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter misi berdasarkan pencarian
   const filteredMissions = useMemo(() => {
-    return missions.filter(mission => 
+    return missions.filter((mission) =>
       mission.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [missions, searchQuery]);
@@ -40,15 +40,15 @@ const MissionPopup = ({
       setNewMission({
         name: "",
         description: "",
-        date: new Date().toLocaleDateString('id-ID', {
-          day: 'numeric',
-          month: 'numeric',
-          year: 'numeric'
+        date: new Date().toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "numeric",
+          year: "numeric",
         }),
-        path: []
+        path: [],
       });
     } catch (error) {
-      console.error('Error closing modal:', error);
+      console.error("Error closing modal:", error);
     }
   };
 
@@ -56,12 +56,12 @@ const MissionPopup = ({
   const handleInputChange = (e) => {
     try {
       const { name, value } = e.target;
-      setNewMission(prev => ({
+      setNewMission((prev) => ({
         ...prev,
         [name]: value,
       }));
     } catch (error) {
-      console.error('Error handling input change:', error);
+      console.error("Error handling input change:", error);
     }
   };
 
@@ -70,7 +70,7 @@ const MissionPopup = ({
     try {
       setSearchQuery(e.target.value);
     } catch (error) {
-      console.error('Error handling search change:', error);
+      console.error("Error handling search change:", error);
     }
   };
 
@@ -81,8 +81,8 @@ const MissionPopup = ({
         onLoadMission(mission);
       }
     } catch (error) {
-      console.error('Error loading mission:', error);
-      alert('Error loading mission. Please try again.');
+      console.error("Error loading mission:", error);
+      alert("Error loading mission. Please try again.");
     }
   };
 
@@ -97,10 +97,10 @@ const MissionPopup = ({
       // Include current markers' path in the mission
       const missionWithPath = {
         ...newMission,
-        path: currentMarkers.map(marker => ({
+        path: currentMarkers.map((marker) => ({
           lat: marker.getLatLng().lat,
-          lng: marker.getLatLng().lng
-        }))
+          lng: marker.getLatLng().lng,
+        })),
       };
 
       // Create new mission
@@ -110,34 +110,36 @@ const MissionPopup = ({
       setNewMission({
         name: "",
         description: "",
-        date: new Date().toLocaleDateString('id-ID', {
-          day: 'numeric',
-          month: 'numeric',
-          year: 'numeric'
+        date: new Date().toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "numeric",
+          year: "numeric",
         }),
-        path: []
+        path: [],
       });
     } catch (error) {
-      console.error('Error submitting mission:', error);
-      alert('Error saving mission. Please try again.');
+      console.error("Error submitting mission:", error);
+      alert("Error saving mission. Please try again.");
     }
   };
 
   // Helper untuk memotong teks
   const truncateText = (text, maxLength = 50) => {
     if (!text) return "";
-    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
   };
 
   // Handler untuk konfirmasi hapus
   const handleDelete = (missionId) => {
     try {
-      if (window.confirm('Are you sure you want to delete this mission?')) {
+      if (window.confirm("Are you sure you want to delete this mission?")) {
         onMissionDelete(missionId);
       }
     } catch (error) {
-      console.error('Error deleting mission:', error);
-      alert('Error deleting mission. Please try again.');
+      console.error("Error deleting mission:", error);
+      alert("Error deleting mission. Please try again.");
     }
   };
 
@@ -156,7 +158,9 @@ const MissionPopup = ({
 
         {/* Form Section */}
         <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-          <h3 className="text-md font-medium text-gray-900 mb-3">Add New Mission</h3>
+          <h3 className="text-md font-medium text-gray-900 mb-3">
+            Add New Mission
+          </h3>
           <div className="space-y-3">
             {/* Mission Name Input */}
             <div>
@@ -172,7 +176,7 @@ const MissionPopup = ({
                 placeholder="Enter mission name"
               />
             </div>
-            
+
             {/* Description Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -218,7 +222,10 @@ const MissionPopup = ({
                 placeholder="Search mission..."
                 className="w-full pl-8 pr-3 py-1.5 border border-gray-300 rounded-md text-sm"
               />
-              <FaSearch className="absolute left-2.5 top-2.5 text-gray-400" size={14} />
+              <FaSearch
+                className="absolute left-2.5 top-2.5 text-gray-400"
+                size={14}
+              />
             </div>
           </div>
 
@@ -287,7 +294,10 @@ const MissionPopup = ({
                   {/* Empty State */}
                   {filteredMissions.length === 0 && (
                     <tr>
-                      <td colSpan="5" className="px-4 py-4 text-sm text-gray-500 text-center">
+                      <td
+                        colSpan="5"
+                        className="px-4 py-4 text-sm text-gray-500 text-center"
+                      >
                         No missions found
                       </td>
                     </tr>
