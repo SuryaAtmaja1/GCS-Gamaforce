@@ -168,7 +168,7 @@ const MissionPopup = ({
                 name="name"
                 value={newMission.name}
                 onChange={handleInputChange}
-                className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-gray-900 text-sm"
+                className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-white text-sm"
                 placeholder="Enter mission name"
               />
             </div>
@@ -182,7 +182,7 @@ const MissionPopup = ({
                 name="description"
                 value={newMission.description}
                 onChange={handleInputChange}
-                className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-gray-900 text-sm"
+                className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-white text-sm"
                 placeholder="Enter mission description"
                 rows="2"
               />

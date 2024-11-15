@@ -76,7 +76,7 @@ const AddMarker = ({ map, markers, onMarkersUpdate, selectedMission }) => {
             draggable: true
           });
 
-          marker.on('dragend', () => {
+          marker.on('drag', () => {
             drawPolyline();
             onMarkersUpdate([...markersRef.current]);
           });
@@ -135,7 +135,7 @@ const AddMarker = ({ map, markers, onMarkersUpdate, selectedMission }) => {
           draggable: true
         });
 
-        marker.on('dragend', () => {
+        marker.on('drag', () => {
           const newLatLng = marker.getLatLng();
           marker.setPopupContent(
             `Lat: ${newLatLng.lat.toFixed(5)}<br>Lng: ${newLatLng.lng.toFixed(5)}`
