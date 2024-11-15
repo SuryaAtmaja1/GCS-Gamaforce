@@ -20,8 +20,8 @@ const MarkerTable = ({ markers, onEditMarker, onDeleteMarker }) => {
 
   //bentuknya di sini ya
   return (
-    <div className="absolute bottom-0 right-0 w-1/3 bg-white shadow-lg rounded-tl-lg overflow-hidden">
-      <div className="max-h-36 overflow-y-auto">
+    <div className="absolute bottom-0 right-0 w-1/3 bg-transparent overflow-hidden">
+      <div className="max-h-36 overflow-y-auto bg-transparent">
         <table className="w-full divide-y divide-gray-200">
           <thead className="bg-gray-50 sticky top-0">
             <tr>

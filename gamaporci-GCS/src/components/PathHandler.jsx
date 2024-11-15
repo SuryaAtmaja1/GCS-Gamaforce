@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-import { FaSave, FaEdit, FaMapMarked } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaEdit, FaSave, FaMapMarked } from 'react-icons/fa';
 
-const PathHandler = ({ markers, selectedMission, onSavePath }) => {
+const PathHandler = ({ markers = [], selectedMission, onSavePath }) => {
+  // State untuk mode editing
   const [isEditing, setIsEditing] = useState(false);
   
+  // Reset editing mode ketika mission berubah
+  useEffect(() => {
+    setIsEditing(false);
+  }, [selectedMission]);
+  
+  // Handler untuk menyimpan path
   const handleSavePath = () => {
     try {
       if (!selectedMission) {
@@ -11,6 +18,7 @@ const PathHandler = ({ markers, selectedMission, onSavePath }) => {
         return;
       }
 
+      // Konversi markers ke format path
       const path = markers.map(marker => {
         const latLng = marker.getLatLng();
         return {
@@ -19,6 +27,7 @@ const PathHandler = ({ markers, selectedMission, onSavePath }) => {
         };
       });
 
+      // Save path dan reset editing mode
       onSavePath(path);
       setIsEditing(false);
       alert('Path saved successfully!');
@@ -28,11 +37,20 @@ const PathHandler = ({ markers, selectedMission, onSavePath }) => {
     }
   };
 
+  // Handler untuk toggle mode editing
+  const handleEditToggle = () => {
+    if (!selectedMission) {
+      alert('Please select a mission first');
+      return;
+    }
+    setIsEditing(!isEditing);
+  };
+
   return (
-    <div className="absolute top-4 right-2 flex flex-col items-end gap-2 z-[1000] p-2 mt-36 ">
+    <div className="absolute top-4 right-2 flex flex-col items-end gap-2 z-[1000] p-2 mt-36">
       {/* Edit Button */}
       <button
-        onClick={() => setIsEditing(!isEditing)}
+        onClick={handleEditToggle}
         className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg transition-colors duration-200 ${
           isEditing 
             ? 'bg-yellow-500 hover:bg-yellow-600' 
@@ -40,7 +58,7 @@ const PathHandler = ({ markers, selectedMission, onSavePath }) => {
         } text-white`}
         title={isEditing ? 'Cancel editing' : 'Start editing path'}
       >
-        <FaEdit />
+        <FaEdit className="text-lg" />
         <span>{isEditing ? 'Cancel Edit' : 'Edit Path'}</span>
       </button>
 
@@ -51,7 +69,7 @@ const PathHandler = ({ markers, selectedMission, onSavePath }) => {
           className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 shadow-lg transition-colors duration-200"
           title="Save current path"
         >
-          <FaSave />
+          <FaSave className="text-lg" />
           <span>Save Path</span>
         </button>
       )}
@@ -59,15 +77,33 @@ const PathHandler = ({ markers, selectedMission, onSavePath }) => {
       {/* Mission Info Badge */}
       <div className="bg-white shadow-lg rounded-lg px-4 py-2 text-sm flex items-center gap-2">
         <FaMapMarked className="text-blue-500" />
-        {selectedMission ? (
-          <div>
-            <span className="font-medium">{selectedMission.name}</span>
-            <span className="text-gray-500 ml-2">({markers.length} points)</span>
-          </div>
-        ) : (
-          <span className="text-gray-500">No mission selected</span>
-        )}
+        <div className="flex items-center gap-1">
+          {selectedMission ? (
+            <>
+              <span className="font-medium text-gray-900">{selectedMission.name}</span>
+              <span className="text-gray-500">({markers.length} points)</span>
+            </>
+          ) : (
+            <span className="text-gray-500">No mission selected</span>
+          )}
+        </div>
       </div>
+
+      {/* Debug Info - Bisa dihapus jika sudah tidak diperlukan */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 bg-white p-2 rounded shadow text-xs">
+          <pre>
+            {JSON.stringify({ 
+              isEditing,
+              selectedMission: selectedMission ? {
+                id: selectedMission.id,
+                name: selectedMission.name
+              } : null,
+              markersCount: markers.length
+            }, null, 2)}
+          </pre>
+        </div>
+      )}
     </div>
   );
 };
