@@ -1,5 +1,3 @@
-// MapComponent.jsx
-
 import L from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
@@ -34,20 +32,33 @@ const MapComponent = ({
         position: 'topright'
       }).addTo(mapInstance.current);
 
-      // Add base map layer
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 18
+      // OPTION 1: Menggunakan Mapbox dengan access token yang valid
+      const MAPBOX_ACCESS_TOKEN = 'YOUR_MAPBOX_ACCESS_TOKEN'; // Ganti dengan token Anda
+      // L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=${MAPBOX_ACCESS_TOKEN}`, {
+      //   attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a>',
+      //   maxZoom: 18,
+      //   tileSize: 512,
+      //   zoomOffset: -1,
+      // }).addTo(mapInstance.current);
+
+      // OPTION 2: Menggunakan Google Satellite (alternatif)
+      L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '© Google'
       }).addTo(mapInstance.current);
+      
+      // OPTION 3: Menggunakan ESRI World Imagery (gratis)
+      // L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      //   attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+      //   maxZoom: 18
+      // }).addTo(mapInstance.current);
 
       setMap(mapInstance.current);
     } else if (mapInstance.current) {
-      // Update view if coordinates change manually (e.g. from LatLonModal)
       mapInstance.current.setView([coordinates.lat, coordinates.lng], 13);
     }
 
-    // Cleanup on unmount
     return () => {
       if (mapInstance.current) {
         mapInstance.current.remove();
@@ -70,7 +81,6 @@ const MapComponent = ({
 
   return (
     <div className="w-full h-full relative">
-      {/* Map container */}
       <div 
         ref={mapRef} 
         className="w-full h-full"
@@ -86,7 +96,6 @@ const MapComponent = ({
         )}
       </div>
 
-      {/* Loading indicator */}
       {!map && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
           <div className="text-gray-600">Loading map...</div>
