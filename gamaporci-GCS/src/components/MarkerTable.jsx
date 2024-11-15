@@ -1,67 +1,56 @@
 import React from "react";
 import { FaTrash } from "react-icons/fa";
-// Mengimpor ikon FaTrash dari react-icons
 
-//deklarasi komponen fungsi yaitu markertable yang nantinya menerima marker onedit dll
-//merker itu array yang nanti di tampilkan dalamnya
-//oneditmarker itu ga guna tapi dia buat edit markernya
-//ondelete marker ni jga ga guna tapi dia buat hapus marker
 const MarkerTable = ({ markers }) => {
-  //deklarasi klo handel delete itu dia nanti ngapain
   const handleDelete = (index) => {
     if (window.confirm("Hapus marker ini?")) {
-      // Memanggil fungsi deleteMarker yang diekspos dari AddMarker
       if (window.deleteMarker) {
         window.deleteMarker(index);
       }
     }
   };
 
-  //bentuknya di sini ya
   return (
-    <div className="absolute bottom-0 right-0 w-1/3 bg-transparent overflow-hidden">
-      <div className="max-h-36 overflow-y-auto bg-transparent">
-        <table className="w-full divide-y divide-gray-200">
+    <div className="absolute bottom-2 right-2 w-52 bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="max-h-32 overflow-y-auto">
+        <table className="w-full divide-y divide-gray-200 text-xs">
           <thead className="bg-gray-50 sticky top-0">
             <tr>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                No
+              <th className="w-6 py-1 text-center font-medium text-gray-500">
+                NO
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                Lat
+              <th className="py-1 text-left font-medium text-gray-500">
+                LAT
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                Long
+              <th className="py-1 text-left font-medium text-gray-500">
+                LONG
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase w-10">
-                Del
+              <th className="w-6 py-1 text-center font-medium text-gray-500">
+                DEL
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {/* dia nampilin si datanya itu gimana nanti lewat sini
-            dia pakai map utnuk iterasi si array markersnya itu  */}
             {markers.map((marker, index) => {
-              // dia nanti mengambil koordinat lat dan long denga  marker.getlatlng()
               const latLng = marker.getLatLng();
               return (
                 <tr key={index} className="hover:bg-gray-50">
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                  <td className="py-1 text-center text-gray-900">
                     {index + 1}
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
-                    {latLng.lat.toFixed(5)}
+                  <td className="py-1 pl-1 whitespace-nowrap text-gray-500">
+                    {latLng.lat.toFixed(4)}
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
-                    {latLng.lng.toFixed(5)}
+                  <td className="py-1 pl-1 whitespace-nowrap text-gray-500">
+                    {latLng.lng.toFixed(4)}
                   </td>
-                  <td className="px-2 py-2 whitespace-nowrap text-center">
+                  <td className="py-1 text-center">
                     <button
                       onClick={() => handleDelete(index, marker)}
                       className="text-red-500 hover:text-red-700"
                       title="Delete marker"
                     >
-                      <FaTrash className="h-3.5 w-3.5" />
+                      <FaTrash className="h-3 w-3" />
                     </button>
                   </td>
                 </tr>
@@ -69,10 +58,7 @@ const MarkerTable = ({ markers }) => {
             })}
             {markers.length === 0 && (
               <tr>
-                <td
-                  colSpan="4"
-                  className="px-3 py-2 text-center text-xs text-gray-500"
-                >
+                <td colSpan="4" className="px-2 py-1 text-center text-gray-500">
                   No markers yet
                 </td>
               </tr>
