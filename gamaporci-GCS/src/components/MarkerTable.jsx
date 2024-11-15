@@ -1,16 +1,15 @@
-import React from 'react';
-import { FaTrash } from 'react-icons/fa'; 
+import React from "react";
+import { FaTrash } from "react-icons/fa";
 // Mengimpor ikon FaTrash dari react-icons
-
 
 //deklarasi komponen fungsi yaitu markertable yang nantinya menerima marker onedit dll
 //merker itu array yang nanti di tampilkan dalamnya
 //oneditmarker itu ga guna tapi dia buat edit markernya
-//ondelete marker ni jga ga guna tapi dia buat hapus marker 
-const MarkerTable = ({ markers, onEditMarker, onDeleteMarker }) => {
-  //deklarasi klo handel delete itu dia nanti ngapain 
-  const handleDelete = (index, marker) => {
-    if (window.confirm('Hapus marker ini?')) {
+//ondelete marker ni jga ga guna tapi dia buat hapus marker
+const MarkerTable = ({ markers }) => {
+  //deklarasi klo handel delete itu dia nanti ngapain
+  const handleDelete = (index) => {
+    if (window.confirm("Hapus marker ini?")) {
       // Memanggil fungsi deleteMarker yang diekspos dari AddMarker
       if (window.deleteMarker) {
         window.deleteMarker(index);
@@ -70,7 +69,10 @@ const MarkerTable = ({ markers, onEditMarker, onDeleteMarker }) => {
             })}
             {markers.length === 0 && (
               <tr>
-                <td colSpan="4" className="px-3 py-2 text-center text-xs text-gray-500">
+                <td
+                  colSpan="4"
+                  className="px-3 py-2 text-center text-xs text-gray-500"
+                >
                   No markers yet
                 </td>
               </tr>
