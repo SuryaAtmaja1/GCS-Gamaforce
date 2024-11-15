@@ -1,110 +1,161 @@
+// AddMarker.jsx
+
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
-// import lah
 
-//deklarasi add marker dengan variable map, markers untuk simpen si array dari marker yang sudah ada, on marker update itu untuk uodate marker nya
-const AddMarker = ({ map, markers, onMarkersUpdate }) => {
-  //draw untuk hold drae items which marker dan garis (polylines)
+const AddMarker = ({ map, markers, onMarkersUpdate, selectedMission, customIcon }) => {
   const drawnItemsRef = useRef(null);
-  //markersref untuk store marker dan add ke map
   const markersRef = useRef([]);
-  //untuk deklar bahwa dia defaultnya engga edit mode
   const [isMarkerMode, setIsMarkerMode] = useState(false);
-  //mengandung button untuk handling click events
   const buttonContainerRef = useRef(null);
+  const polylineRef = useRef(null);
 
-
-  //untuk membuat garis antara marker satu dengan marker yang lainnya
-  const drawPolyline = () => {
+  // Function to draw polyline between markers
+  const drawPolyline = (markersList = markersRef.current) => {
     try {
-      // Remove existing polylines first
-      if (drawnItemsRef.current) {
-        drawnItemsRef.current.eachLayer((layer) => {
-          if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
-            drawnItemsRef.current.removeLayer(layer);
-          }
-        });
+      // Remove existing polylines
+      if (polylineRef.current) {
+        map.removeLayer(polylineRef.current);
       }
 
       // Draw new polyline if we have at least 2 markers
-      if (markersRef.current.length >= 2) {
-        const coordinates = markersRef.current.map(marker => marker.getLatLng());
-        const polyline = L.polyline(coordinates, {
-          color: '#3388ff',
+      if (markersList.length >= 2) {
+        const coordinates = markersList.map(marker => marker.getLatLng());
+        polylineRef.current = L.polyline(coordinates, {
+          color: '#3b82f6',
           weight: 3,
-          opacity: 0.8
-        });
-        
-        drawnItemsRef.current.addLayer(polyline);
+          opacity: 1
+        }).addTo(map);
       }
     } catch (error) {
       console.error('Error drawing polyline:', error);
     }
   };
 
-  useEffect(() => {
-    if (!map) return;
-    //kalo map maka dia menginisialisasikan items which marker
+  // Clear all layers and markers
+  const clearAllLayers = () => {
     try {
-      // Initialize FeatureGroup if it doesn't exist
-      if (!drawnItemsRef.current) {
-        drawnItemsRef.current = new L.FeatureGroup();
-        map.addLayer(drawnItemsRef.current);
+      if (drawnItemsRef.current) {
+        drawnItemsRef.current.clearLayers();
       }
+      if (polylineRef.current) {
+        map.removeLayer(polylineRef.current);
+      }
+      markersRef.current = [];
+    } catch (error) {
+      console.error('Error clearing layers:', error);
+    }
+  };
 
-      const handleMapClick = (e) => {
-        if (!isMarkerMode) return;
-        //jadi ketika kita click dia di button dia tidak akan mendeteksi itu sebagai inisialisasi marker baru
-        if (buttonContainerRef.current) {
-          const rect = buttonContainerRef.current.getBoundingClientRect();
-          if (e.originalEvent.clientX >= rect.left && 
-              e.originalEvent.clientX <= rect.right && 
-              e.originalEvent.clientY >= rect.top && 
-              e.originalEvent.clientY <= rect.bottom) {
-            return;
-          }
-        }
-        
-        //untuk dia bisa dipindah pindah yaw
-        try {
-          const marker = L.marker(e.latlng, {
-            draggable: true
+  // Load markers from mission
+  useEffect(() => {
+    if (!map || !selectedMission) return;
+
+    try {
+      clearAllLayers();
+      markersRef.current = [];
+
+      if (selectedMission.path && selectedMission.path.length > 0) {
+        const newMarkers = selectedMission.path.map(point => {
+          const marker = L.marker([point.lat, point.lng], {
+            draggable: true,
+            icon: customIcon
           });
 
-          marker.on('drag dragend', () => {
+          marker.on('dragend', () => {
             drawPolyline();
             onMarkersUpdate([...markersRef.current]);
           });
 
-          drawnItemsRef.current.addLayer(marker);
-          markersRef.current.push(marker);
-          onMarkersUpdate([...markersRef.current]);
+          // Add popup with coordinates
+          marker.bindPopup(`Lat: ${point.lat.toFixed(5)}<br>Lng: ${point.lng.toFixed(5)}`);
           
-          // Draw polyline after adding marker
-          drawPolyline();
-        } catch (error) { //kalau lat dan lon nya tidak terdeteksi dan atau ada fungsi yang salah dalam program
-          console.error('Error adding marker:', error);
-        }
-      };
+          marker.addTo(map);
+          return marker;
+        });
 
-      map.on('click', handleMapClick);
+        markersRef.current = newMarkers;
+        onMarkersUpdate(newMarkers);
+        drawPolyline(newMarkers);
+      }
+    } catch (error) {
+      console.error('Error loading mission markers:', error);
+    }
+  }, [map, selectedMission]);
+
+  // Initialize map layers
+  useEffect(() => {
+    if (!map) return;
+
+    try {
+      drawnItemsRef.current = new L.FeatureGroup().addTo(map);
 
       return () => {
-        map.off('click', handleMapClick);
+        clearAllLayers();
       };
     } catch (error) {
-      console.error('Error initializing marker control:', error);
+      console.error('Error initializing map layers:', error);
     }
-  }, [map, isMarkerMode, onMarkersUpdate]);
+  }, [map]);
 
-  // Fungsi deleteMarker tanpa konfirmasi
+  // Map click handler
+  useEffect(() => {
+    if (!map) return;
+
+    const handleMapClick = (e) => {
+      if (!isMarkerMode) return;
+
+      // Prevent adding marker when clicking on buttons
+      if (buttonContainerRef.current) {
+        const rect = buttonContainerRef.current.getBoundingClientRect();
+        if (e.originalEvent.clientX >= rect.left && 
+            e.originalEvent.clientX <= rect.right && 
+            e.originalEvent.clientY >= rect.top && 
+            e.originalEvent.clientY <= rect.bottom) {
+          return;
+        }
+      }
+
+      try {
+        const marker = L.marker(e.latlng, {
+          draggable: true,
+          icon: customIcon
+        });
+
+        marker.on('dragend', () => {
+          const newLatLng = marker.getLatLng();
+          marker.setPopupContent(
+            `Lat: ${newLatLng.lat.toFixed(5)}<br>Lng: ${newLatLng.lng.toFixed(5)}`
+          );
+          drawPolyline();
+          onMarkersUpdate([...markersRef.current]);
+        });
+
+        marker.bindPopup(`Lat: ${e.latlng.lat.toFixed(5)}<br>Lng: ${e.latlng.lng.toFixed(5)}`);
+        marker.addTo(map);
+        
+        markersRef.current.push(marker);
+        onMarkersUpdate([...markersRef.current]);
+        drawPolyline();
+      } catch (error) {
+        console.error('Error adding marker:', error);
+      }
+    };
+
+    map.on('click', handleMapClick);
+
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [map, isMarkerMode]);
+
   const deleteMarker = (index) => {
     try {
       if (index >= 0 && index < markersRef.current.length) {
         const marker = markersRef.current[index];
-        drawnItemsRef.current.removeLayer(marker);
+        map.removeLayer(marker);
         markersRef.current = markersRef.current.filter((_, i) => i !== index);
         onMarkersUpdate([...markersRef.current]);
         drawPolyline();
@@ -114,16 +165,11 @@ const AddMarker = ({ map, markers, onMarkersUpdate }) => {
     }
   };
 
-  const toggleMarkerMode = () => {
-    setIsMarkerMode(!isMarkerMode);
-    map.getContainer().style.cursor = !isMarkerMode ? 'crosshair' : '';
-  };
-
-  const clearMarkers = () => {
-    if (window.confirm('Hapus semua marker?')) {
+  const clearMarkers = (showConfirm = true) => {
+    const proceedWithClear = showConfirm ? window.confirm('Hapus semua marker?') : true;
+    if (proceedWithClear) {
       try {
-        drawnItemsRef.current.clearLayers();
-        markersRef.current = [];
+        clearAllLayers();
         onMarkersUpdate([]);
       } catch (error) {
         console.error('Error clearing markers:', error);
@@ -131,31 +177,21 @@ const AddMarker = ({ map, markers, onMarkersUpdate }) => {
     }
   };
 
+  const toggleMarkerMode = () => {
+    setIsMarkerMode(!isMarkerMode);
+    map.getContainer().style.cursor = !isMarkerMode ? 'crosshair' : '';
+  };
+
+  // Expose deleteMarker function globally
   if (typeof window !== 'undefined') {
     window.deleteMarker = deleteMarker;
   }
 
   return (
-    <div 
-      style={{
-        position: 'absolute',
-        top: 25,
-        right: 0,
-        width: '200px',
-        height: '150px',
-        pointerEvents: 'none',
-        zIndex: 1001
-      }}
-    >
+    <div className="absolute top-6 right-0 w-[200px] h-[150px] pointer-events-none z-[1001]">
       <div 
         ref={buttonContainerRef}
-        style={{
-          position: 'absolute',
-          top: '50px',
-          right: '10px',
-          pointerEvents: 'auto',
-          backgroundColor: 'transparent'
-        }}
+        className="absolute top-[50px] right-[10px] pointer-events-auto bg-transparent"
       >
         <div className="flex flex-col gap-2 p-1">
           <button
@@ -171,7 +207,7 @@ const AddMarker = ({ map, markers, onMarkersUpdate }) => {
           </button>
           <button
             type="button"
-            onClick={clearMarkers}
+            onClick={() => clearMarkers(true)}
             className="px-3 py-1.5 rounded text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 shadow-sm"
           >
             🗑️ Clear Map
