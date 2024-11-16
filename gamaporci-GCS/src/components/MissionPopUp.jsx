@@ -1,26 +1,26 @@
 // MissionPopup.jsx
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { FaTrash, FaSearch, FaMapMarked } from "react-icons/fa";
 
 const MissionPopup = ({
   setMissionClick,
-  missions = [],
-  onMissionUpdate,
+  missions,
   onMissionDelete,
   currentMarkers = [],
   onLoadMission,
+  setMissions,
 }) => {
   // State untuk misi baru
   const [newMission, setNewMission] = useState({
-    name: "",
+    nama: "",
     description: "",
     date: new Date().toLocaleDateString("id-ID", {
       day: "numeric",
       month: "numeric",
       year: "numeric",
     }),
-    path: [],
+    coord: [],
   });
 
   // State untuk pencarian
@@ -28,8 +28,8 @@ const MissionPopup = ({
 
   // Filter misi berdasarkan pencarian
   const filteredMissions = useMemo(() => {
-    return missions.filter((mission) =>
-      mission.name.toLowerCase().includes(searchQuery.toLowerCase())
+    return missions.missions.filter((mission) =>
+      mission.nama.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [missions, searchQuery]);
 
@@ -38,14 +38,14 @@ const MissionPopup = ({
     try {
       setMissionClick(false);
       setNewMission({
-        name: "",
+        nama: "",
         description: "",
         date: new Date().toLocaleDateString("id-ID", {
           day: "numeric",
           month: "numeric",
           year: "numeric",
         }),
-        path: [],
+        coord: [],
       });
     } catch (error) {
       console.error("Error closing modal:", error);
@@ -87,39 +87,65 @@ const MissionPopup = ({
   };
 
   // Handler untuk submit form
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     try {
-      if (newMission.name.trim() === "") {
-        alert("Please enter a mission name");
+      // Validate mission name
+      if (newMission.nama.trim() === "") {
+        alert("Please enter a mission name.");
         return;
       }
 
-      // Include current markers' path in the mission
+      // Prepare mission data, including current markers
       const missionWithPath = {
         ...newMission,
-        path: currentMarkers.map((marker) => ({
-          lat: marker.getLatLng().lat,
-          lng: marker.getLatLng().lng,
-        })),
+        coord: currentMarkers.map((marker) => [
+          marker.getLatLng().lat,
+          marker.getLatLng().lng,
+        ]),
       };
 
-      // Create new mission
-      onMissionUpdate(missionWithPath);
+      // POST request to save the mission
+      const response = await fetch("http://localhost:5001/api/missions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(missionWithPath),
+      });
 
-      // Reset form
+      // Handle response
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to save mission: ${response.status} - ${errorText}`
+        );
+      }
+
+      const savedMission = await response.json();
+      console.log("Mission added:", savedMission);
+
+      // Update frontend state to include the new mission
+      setMissions((prevMissions) => ({
+        ...prevMissions,
+        missions: [...prevMissions.missions, savedMission],
+      }));
+
+      // Reset the form and close modal
       setNewMission({
-        name: "",
+        nama: "",
         description: "",
         date: new Date().toLocaleDateString("id-ID", {
           day: "numeric",
           month: "numeric",
           year: "numeric",
         }),
-        path: [],
+        coord: [],
       });
+      setMissionClick(false); // Close modal
+      alert("Mission added successfully!");
     } catch (error) {
-      console.error("Error submitting mission:", error);
-      alert("Error saving mission. Please try again.");
+      console.error("Error saving mission:", error.message);
+      alert(`Error saving mission: ${error.message}`);
     }
   };
 
@@ -131,15 +157,48 @@ const MissionPopup = ({
       : text;
   };
 
-  // Handler untuk konfirmasi hapus
-  const handleDelete = (missionId) => {
+  const fetchMissions = async () => {
     try {
-      if (window.confirm("Are you sure you want to delete this mission?")) {
-        onMissionDelete(missionId);
-      }
+      const response = await fetch("http://localhost:5001/api/missions");
+      const data = await response.json();
+      setMissions(data); // Update state with fresh mission data
     } catch (error) {
-      console.error("Error deleting mission:", error);
-      alert("Error deleting mission. Please try again.");
+      console.error("Error fetching missions:", error);
+    }
+  };
+
+  const handleDelete = async (missionId) => {
+    try {
+      if (!window.confirm("Are you sure you want to delete this mission?")) {
+        return;
+      }
+
+      const response = await fetch(
+        `http://localhost:5001/api/missions/${missionId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to delete mission: ${response.status} - ${errorText}`
+        );
+      }
+
+      // Update frontend state after deletion
+      setMissions((prevMissions) => ({
+        ...prevMissions,
+        missions: prevMissions.missions.filter(
+          (mission) => mission.id !== missionId
+        ),
+      }));
+
+      alert("Mission deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting mission:", error.message);
+      alert(`Error deleting mission: ${error.message}`);
     }
   };
 
@@ -169,8 +228,8 @@ const MissionPopup = ({
               </label>
               <input
                 type="text"
-                name="name"
-                value={newMission.name}
+                name="nama"
+                value={newMission.nama}
                 onChange={handleInputChange}
                 className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-white text-sm"
                 placeholder="Enter mission name"
@@ -254,15 +313,15 @@ const MissionPopup = ({
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredMissions.map((mission) => (
-                    <tr key={mission.id} className="hover:bg-gray-50">
+                    <tr key={mission.mission_id} className="hover:bg-gray-50">
                       <td className="px-4 py-2 text-sm text-gray-900">
-                        {mission.name}
+                        {mission.nama}
                       </td>
                       <td className="px-4 py-2 text-sm text-gray-900">
                         {mission.date}
                       </td>
                       <td className="px-4 py-2 text-sm text-gray-900">
-                        {mission.path?.length || 0} points
+                        {mission.coord?.length || 0} points
                       </td>
                       <td className="px-4 py-2 text-sm text-gray-900 max-w-[200px]">
                         <div className="truncate" title={mission.description}>
@@ -281,7 +340,7 @@ const MissionPopup = ({
                           </button>
                           {/* Delete Button */}
                           <button
-                            onClick={() => handleDelete(mission.id)}
+                            onClick={() => handleDelete(mission.mission_id)}
                             className="text-red-500 hover:text-red-700"
                             title="Delete mission"
                           >

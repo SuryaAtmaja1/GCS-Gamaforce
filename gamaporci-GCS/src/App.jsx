@@ -49,36 +49,26 @@ function App() {
   };
 
   // Initialize missions state from localStorage or defaults
-  const [missions, setMissions] = useState(() => {
-    try {
-      const savedMissions = localStorage.getItem("missions");
-      if (savedMissions) {
-        return JSON.parse(savedMissions);
-      }
-    } catch (error) {
-      console.error("Error loading missions from localStorage:", error);
-    }
-    // Default missions if none in localStorage
-    return [
-      {
-        id: 1,
-        name: "Misi 1",
-        description: "",
-        date: getCurrentDate(),
-        path: [],
-        originalCreationDate: getCurrentDate(),
-      },
-      {
-        id: 2,
-        name: "Misi 2",
-        description: "",
-        date: getCurrentDate(),
-        path: [],
-        originalCreationDate: getCurrentDate(),
-      },
-    ];
-  });
+  const [missions, setMissions] = useState();
 
+  console.log(missions);
+  useEffect(() => {
+    fetch("http://localhost:5001/api/missions")
+      .then((response) => response.json())
+      .then((data) => {
+        setMissions(data);
+      })
+      .catch((error) => console.error("Error fetching misson: ", error));
+  }, []);
+
+  const deleteMarker = (markerIndex) => {
+    setMarkers((prevMarkers) => {
+      const updatedMarkers = prevMarkers.filter(
+        (_, index) => index !== markerIndex
+      );
+      return updatedMarkers;
+    });
+  };
   // Handler untuk menyimpan path yang diupdate
   const handleSavePath = (newPath) => {
     try {
@@ -89,7 +79,7 @@ function App() {
         if (mission.id === selectedMission.id) {
           return {
             ...mission,
-            path: newPath,
+            coord: newPath,
             date: getCurrentDate(),
           };
         }
@@ -100,7 +90,7 @@ function App() {
       setMissions(updatedMissions);
       setSelectedMission({
         ...selectedMission,
-        path: newPath,
+        coord: newPath,
       });
 
       // Simpan ke localStorage
@@ -122,6 +112,7 @@ function App() {
   };
 
   const handleLoadMission = async (mission) => {
+    console.log(mission.coord);
     try {
       setIsLoading(true);
 
@@ -130,10 +121,10 @@ function App() {
 
       // Step 2: Wait a moment before adding new markers to ensure state update completes
       setTimeout(() => {
-        if (mission.path && mission.path.length > 0) {
+        if (mission.coord && mission.coord.length > 0) {
           // Create new markers from mission path
-          const newMarkers = mission.path.map((point) => {
-            const marker = new L.Marker([point.lat, point.lng], {
+          const newMarkers = mission.coord.map(([lat, lng]) => {
+            const marker = new L.Marker([lat, lng], {
               draggable: true,
               icon: customIcon,
             });
@@ -145,7 +136,7 @@ function App() {
 
             // Add popup with coordinates
             marker.bindPopup(
-              `Lat: ${point.lat.toFixed(5)}<br>Lng: ${point.lng.toFixed(5)}`
+              `Lat: ${lat.toFixed(5)}<br>Lng: ${lng.toFixed(5)}`
             );
 
             return marker;
@@ -155,10 +146,11 @@ function App() {
           setMarkers(newMarkers);
           setSelectedMission(mission);
 
+          const firstCoord = mission.coord[0];
           // Center map on the first marker
           setCoordinates({
-            lat: mission.path[0].lat,
-            lng: mission.path[0].lng,
+            lat: firstCoord[0],
+            lng: firstCoord[0],
           });
         } else {
           setSelectedMission(mission);
@@ -167,64 +159,6 @@ function App() {
     } catch (error) {
       console.error("Error loading mission:", error);
       alert("Error loading mission. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handler for updating a mission
-  const handleMissionUpdate = (newMission) => {
-    try {
-      setIsLoading(true);
-
-      // Convert current markers to path format
-      const path = markers.map((marker) => {
-        const latLng = marker.getLatLng();
-        return {
-          lat: latLng.lat,
-          lng: latLng.lng,
-        };
-      });
-
-      const missionWithPath = {
-        ...newMission,
-        path: path,
-      };
-
-      if (newMission.id) {
-        // Update existing mission
-        setMissions(
-          missions.map((mission) =>
-            mission.id === newMission.id
-              ? {
-                  ...missionWithPath,
-                  date: getCurrentDate(),
-                  originalCreationDate: mission.originalCreationDate,
-                }
-              : mission
-          )
-        );
-
-        // Update selectedMission if it's being edited
-        if (selectedMission?.id === newMission.id) {
-          setSelectedMission(missionWithPath);
-        }
-      } else {
-        // Add new mission
-        const newMissionWithId = {
-          ...missionWithPath,
-          id: missions.length + 1,
-          date: getCurrentDate(),
-          originalCreationDate: getCurrentDate(),
-        };
-        setMissions((prevMissions) => [...prevMissions, newMissionWithId]);
-      }
-
-      // Show success message
-      alert("Mission saved successfully!");
-    } catch (error) {
-      console.error("Error updating mission:", error);
-      alert("Error saving mission. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -267,7 +201,6 @@ function App() {
       console.error("Error saving missions to localStorage:", error);
     }
   }, [missions]);
-
   return (
     <>
       <div className="flex relative">
@@ -290,10 +223,10 @@ function App() {
             <MissionPopup
               setMissionClick={setMissionClick}
               missions={missions}
-              onMissionUpdate={handleMissionUpdate}
               onMissionDelete={handleMissionDelete}
               currentMarkers={markers}
               onLoadMission={handleLoadMission}
+              setMissions={setMissions}
             />
           )}
         </div>
@@ -313,7 +246,6 @@ function App() {
             markers={markers}
             onMarkersUpdate={handleMarkersUpdate}
             selectedMission={selectedMission}
-            customIcon={customIcon}
           />
 
           {/* Path Handler Component */}
@@ -325,7 +257,11 @@ function App() {
 
           {/* Marker Table */}
           <div className="absolute bottom-4 left-4 right-4 z-[1000]">
-            <MarkerTable markers={markers} />
+            <MarkerTable
+              markers={markers}
+              missionId={selectedMission ? selectedMission.mission_id : null}
+              deleteMarker={deleteMarker}
+            />
           </div>
         </div>
       </div>

@@ -16,20 +16,31 @@ class MissionController {
   static async createMission(req, res) {
     try {
       const { nama, description, coord, date } = req.body;
-      if (!nama || !coord || !Array.isArray(coord) || !date) {
+
+      // Validate required fields
+      if (
+        !nama ||
+        !Array.isArray(coord) ||
+        !coord.every((point) => Array.isArray(point) && point.length === 2) ||
+        !date
+      ) {
         return res.status(400).json({
           status: "error",
           message: "Data misi tidak valid",
         });
       }
+
+      // Create a new mission
       const newMission = await Mission.create({
         nama,
         description,
         coord,
         date,
       });
+
       res.status(201).json(newMission);
     } catch (error) {
+      console.error("Error creating mission:", error);
       res.status(500).json({
         status: "error",
         message: "Gagal membuat misi",
@@ -104,6 +115,30 @@ class MissionController {
         status: "error",
         massage: "gagal menghapus misi",
       });
+    }
+  }
+
+  static async deleteMarkerFromMission(req, res) {
+    const { missionId, markerIndex } = req.params;
+
+    try {
+      const mission = await Mission.findById(missionId);
+      if (!mission) {
+        return res.status(404).json({ message: "Misi tidak ditemukan" });
+      }
+
+      if (mission.path && mission.path[markerIndex]) {
+        mission.path.splice(markerIndex, 1);
+        await mission.save();
+        return res.status(200).json(mission);
+      } else {
+        return res
+          .status(400)
+          .json({ message: "Marker tidak ditemukan di misi" });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Server error" });
     }
   }
 }

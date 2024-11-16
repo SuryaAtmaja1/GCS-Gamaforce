@@ -6,7 +6,7 @@ const missionRoutes = require("./routes/missionRoutes");
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/missions", missionRoutes);
